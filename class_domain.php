@@ -59,7 +59,7 @@
 		     if( isset($WHOIS_SERVER) && is_array($WHOIS_SERVER) )
 			    return $WHOIS_SERVER;			 
 			 else 
-			    exit('WHOIS_SERVER MUST BE AN ARRAY')
+			    exit('WHOIS_SERVER MUST BE AN ARRAY');
 		 }
 		 
 		 else{ exit('Whois Server File "'.$sorce.'" Not Found'); }
