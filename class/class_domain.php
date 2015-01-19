@@ -1,4 +1,4 @@
-<?php
+<?php define('PHP_DOMAIN_CHECK', TRUE);
 
 /*
    PHP DOMAIN CHECK
@@ -9,21 +9,21 @@
 
  class Domain_Checker {
  
-     public $WHOIS_SERVER = false;
+     public $WHOIS_SERVER = array();
+	 public $WHOIS_FILE = null;
 	 public $timeout = 20;
 	
-	public function __construct($WHOIS_SERVER_FILE=false) {
-	
-	  $this->WHOIS_SERVER = load_whois_data($WHOIS_SERVER_FILE);
-
-	}
 	
 	function cek_available_domain($dom_name=false) {
+	
+	    if(!$this->WHOIS_FILE==null) { 
+		
+		$this->WHOIS_SERVER = $this->load_whois_data($this->WHOIS_FILE);
 
 		$domain_name = ( ($dom_name) ? strtolower($dom_name) : false );
 		
-		if ( gethostbyname($domain_name) == $domain_name ) {
-
+		 if ( gethostbyname($domain_name) == $domain_name ) {
+		 
 			$ext = $this->dom_extension($dom_name);
 
 			if (isset($this->WHOIS_SERVER[$ext][0])) {
@@ -31,20 +31,27 @@
 				$whois_server = $this->WHOIS_SERVER[$ext][0];
 				$Not_Found = $this->WHOIS_SERVER[$ext][1];
 				
-			} else {throw new Exception("Domain extension not Supported!");}
+			} else { exit('Domain extension not Supported!'); }
 
 			$OPtest = fsockopen($whois_server, 43, $errno, $errstr, $this->timeout);
 	
-				$out = $domain . "\r\n";
+				$out = $domain_name . "\r\n";
 				fwrite($OPtest, $out);
 				$whois = null;
-				while (!feof($OPtest)) { $whois .= fgets($OPtest, 128); }
+				
+				while (!@feof($OPtest)) { 
+				  $whois .= fgets($OPtest, 128); 
+				}
+				 
 				fclose($OPtest);
 
 				if (strpos($whois,$Not_Found)) return TRUE; 
 				else  return FALSE;
 				
-		} else {return FALSE;}
+		 } else {return FALSE;}
+	   }
+	   
+	   else { exit('Whois Files Not Found!'); }
 	}
 	
 
